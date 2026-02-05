@@ -11,6 +11,13 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
+  School,
+  ClipboardCheck,
+  FileOutput,
+  BookOpen,
+  IdCard,
+  FileText,
+  Calendar,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRole } from "@/contexts/role-context";
@@ -23,18 +30,28 @@ import {
 } from "@/components/ui/tooltip";
 
 const adminLinks = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/students", label: "Students", icon: Users },
   { href: "/teachers", label: "Teachers", icon: GraduationCap },
-  { href: "/calendar", label: "Calendar", icon: CalendarDays },
+  { href: "/classes", label: "Class Management", icon: School },
+  { href: "/subjects", label: "Subject Management", icon: BookOpen },
+  { href: "/attendance", label: "Attendance", icon: ClipboardCheck },
+  { href: "/output-of-work", label: "Output of Work", icon: FileOutput },
+  { href: "/lesson-plans", label: "Lesson Plans", icon: FileText },
+  { href: "/id-cards", label: "ID Cards", icon: IdCard },
+  { href: "/events", label: "Events", icon: Calendar },
   { href: "/finance", label: "Finance", icon: DollarSign },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 const teacherLinks = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/students", label: "My Students", icon: Users },
-  { href: "/calendar", label: "Calendar", icon: CalendarDays },
+  { href: "/classes", label: "My Classes", icon: School },
+  { href: "/attendance", label: "Attendance", icon: ClipboardCheck },
+  { href: "/output-of-work", label: "Output of Work", icon: FileOutput },
+  { href: "/lesson-plans", label: "Lesson Plans", icon: FileText },
+  { href: "/events", label: "Events", icon: Calendar },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
@@ -75,8 +92,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         <nav className="flex-1 space-y-1 px-2 py-4">
           {links.map((link) => {
             const isActive =
-              link.href === "/"
-                ? pathname === "/"
+              link.href === "/dashboard"
+                ? pathname === "/dashboard"
                 : pathname.startsWith(link.href);
 
             const linkContent = (
