@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
+import { useAuth } from "./auth-context";
 
 export type Role = "admin" | "teacher";
 
@@ -12,7 +13,15 @@ interface RoleContextType {
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
 export function RoleProvider({ children }: { children: ReactNode }) {
-  const [role, setRole] = useState<Role>("admin");
+  const { user } = useAuth();
+  const [role, setRole] = useState<Role>(user?.role || "admin");
+
+  // Sync role with authenticated user
+  useEffect(() => {
+    if (user?.role) {
+      setRole(user.role);
+    }
+  }, [user?.role]);
 
   return (
     <RoleContext.Provider value={{ role, setRole }}>
