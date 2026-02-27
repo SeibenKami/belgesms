@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useCallback, useMemo, useSyncExternalStore, ReactNode } from "react";
 import { Role } from "./role-context";
 
 interface User {
@@ -38,24 +38,45 @@ const MOCK_USERS = [
   },
 ];
 
+const STORAGE_KEY = "belgesms_user";
+
+// External store helpers for useSyncExternalStore
+let listeners: Array<() => void> = [];
+
+function emitChange() {
+  for (const listener of listeners) {
+    listener();
+  }
+}
+
+function subscribe(listener: () => void) {
+  listeners = [...listeners, listener];
+  return () => {
+    listeners = listeners.filter((l) => l !== listener);
+  };
+}
+
+function getSnapshot(): string | null {
+  return localStorage.getItem(STORAGE_KEY);
+}
+
+function getServerSnapshot(): string | null {
+  return null;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const storedUserJson = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  // Check for existing session on mount
-  useEffect(() => {
-    const storedUser = localStorage.getItem("belgesms_user");
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch {
-        localStorage.removeItem("belgesms_user");
-      }
+  const user = useMemo<User | null>(() => {
+    if (!storedUserJson) return null;
+    try {
+      return JSON.parse(storedUserJson);
+    } catch {
+      return null;
     }
-    setIsLoading(false);
-  }, []);
+  }, [storedUserJson]);
 
-  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+  const login = useCallback(async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -64,26 +85,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
 
     if (foundUser) {
-      const { password: _, ...userWithoutPassword } = foundUser;
-      setUser(userWithoutPassword);
-      localStorage.setItem("belgesms_user", JSON.stringify(userWithoutPassword));
+      const userWithoutPassword = { id: foundUser.id, name: foundUser.name, email: foundUser.email, role: foundUser.role };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(userWithoutPassword));
+      emitChange();
       return { success: true };
     }
 
     return { success: false, error: "Invalid email or password" };
-  };
+  }, []);
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("belgesms_user");
-  };
+  const logout = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+    emitChange();
+  }, []);
 
   return (
     <AuthContext.Provider
       value={{
         user,
         isAuthenticated: !!user,
-        isLoading,
+        isLoading: false,
         login,
         logout,
       }}
