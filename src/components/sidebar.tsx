@@ -19,6 +19,7 @@ import {
   FileText,
   Calendar,
   FileCheck,
+  FileBarChart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRole } from "@/contexts/role-context";
@@ -42,6 +43,7 @@ const adminLinks = [
   { href: "/id-cards", label: "ID Cards", icon: IdCard },
   { href: "/events", label: "Events", icon: Calendar },
   { href: "/examinations", label: "Examinations", icon: FileCheck },
+  { href: "/reports", label: "Reports", icon: FileBarChart },
   { href: "/finance", label: "Finance", icon: DollarSign },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
@@ -55,6 +57,7 @@ const teacherLinks = [
   { href: "/lesson-plans", label: "Lesson Plans", icon: FileText },
   { href: "/events", label: "Events", icon: Calendar },
   { href: "/examinations", label: "Examinations", icon: FileCheck },
+  { href: "/reports", label: "Reports", icon: FileBarChart },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
